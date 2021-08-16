@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-display = False
+display = True
 
 def encrypt(img, msg, key):
     rows, cols = msg.shape[:2]
