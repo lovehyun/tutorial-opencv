@@ -13,17 +13,17 @@ blue_value = 0
 def red_change(value):
     global red_value
     red_value = value - 255
-    print("Red changed: ", red_value)
+    # print("Red changed: ", red_value)
 
 def green_change(value):
     global green_value
     green_value = value - 255
-    print("Green changed: ", green_value)
+    # print("Green changed: ", green_value)
 
 def blue_change(value):
     global blue_value
     blue_value = value - 255
-    print("Blue changed: ", blue_value)
+    # print("Blue changed: ", blue_value)
 
 cv2.createTrackbar("brighness", name, 128, 255, lambda x : x)
 cv2.createTrackbar("contrast", name, 10, 20, lambda x : x)

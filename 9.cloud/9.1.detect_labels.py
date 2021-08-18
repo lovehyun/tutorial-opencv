@@ -1,7 +1,7 @@
 import boto3
 import sys
 
-BUCKET = "shpark-rekognition" # put your own bucket
+BUCKET = "shpark-rekognition" # put your own bucket here
 KEY = ""
 
 def get_labels(bucket, key, max_labels=10, min_confidence=90, region="ap-northeast-2"):

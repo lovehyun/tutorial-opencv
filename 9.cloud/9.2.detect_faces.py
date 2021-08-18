@@ -2,7 +2,7 @@ import boto3
 import sys
 import pprint
 
-BUCKET = "shpark-rekognition"
+BUCKET = "shpark-rekognition" # put your own bucket here
 KEY = ""
 
 FEATURES_IGNORED = ("Landmarks", "Pose", "Quality", "BoundingBox", "Confidence", "Beard", "Mustache", "EyesOpen", "MouthOpen")

@@ -12,7 +12,7 @@ cv2.imshow('original', img)
 
 concept = True
 
-# part 1. brighness - 컨셉
+# part 1. brightness - 컨셉
 enhance = 50
 bright = np.zeros(img.shape, np.uint8)
 if concept is True:

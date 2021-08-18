@@ -1,3 +1,4 @@
+# pip install opencv-python
 import cv2
 
 # part 1. 이미지 로딩
