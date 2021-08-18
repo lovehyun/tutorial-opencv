@@ -33,6 +33,7 @@ cv2.imshow('transform', img_output)
 cv2.waitKey()
 
 # part 3. perspective transform - 4pt
+# 4개의 포인트를 통한 투시(perspective) 변환
 #   src (cols*0.5,0), (cols,0), (cols*0.5,rows), (cols,rows)
 #   dst (0,0),        (cols,0), (cols*0.33,rows) (cols*0.66,rows)
 src_points = np.float32([[int(0.5*(cols-1)),0], [cols-1,0], [int(0.5*(cols-1)),rows-1], [cols-1,rows-1]])

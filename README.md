@@ -14,6 +14,7 @@
 4. draw : OpenCV 를 사용한 간단한 draw 기능
 5. video : 동영상 처리, 웹캠 처리
 6. detection : 각종 검출 (haar-cascade 등)
+7. tracking : 개체 추척 (mog 등)
 8. cnn : 기본 딥러닝 기술 (yolo 등)
 9. cloud : cloud API 사용하기
 
