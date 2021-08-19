@@ -6,7 +6,7 @@ from log_wrapper import log
 
 
 # https://docs.aws.amazon.com/rekognition/latest/dg/images-displaying-bounding-boxes.html
-def mark_face_image(photo, location, filename=None):
+def mark_face_image(photo, location, filename=None, crop=False):
     image = Image.open(photo)
     img_width, img_height = image.size
 
@@ -29,7 +29,11 @@ def mark_face_image(photo, location, filename=None):
     # draw.rectangle([left,top, left + width, top + height], outline='#00d400')
 
     if filename:
-        image.save(filename)
+        if crop is False:
+            image.save(filename)
+        else:
+            roi = image.crop((left, top, left+width, top+height))
+            roi.save(filename)
         log.info("Result image '%s' saved", filename)
 
     return image

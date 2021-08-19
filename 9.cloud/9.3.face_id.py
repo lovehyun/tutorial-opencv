@@ -8,6 +8,21 @@ from pil_wrapper import mark_face_image, merge_two_images
 BUCKET = 'shpark-rekognition'
 COLLECTION = 'my-faces'
 
+# https://docs.aws.amazon.com/ko_kr/rekognition/latest/dg/faces-detect-images.html
+def detect_faces(bucket, key, attributes=['ALL'], region='ap-northeast-2'):
+    client = boto3.client('rekognition', region)
+    resp = client.detect_faces(
+        Image={
+            'S3Object': {
+                'Bucket': bucket,
+                'Name': key,
+            }
+        },
+        Attributes=attributes,
+    )
+
+    return resp['FaceDetails']
+
 # https://docs.aws.amazon.com/ko_kr/rekognition/latest/dg/API_CompareFaces.html
 # https://docs.aws.amazon.com/ko_kr/rekognition/latest/dg/faces-comparefaces.html
 def compare_faces(bucket, key1, key2, threshold=50, region='ap-northeast-2'):
@@ -31,7 +46,7 @@ def compare_faces(bucket, key1, key2, threshold=50, region='ap-northeast-2'):
     return resp['SourceImageFace'], resp['FaceMatches']
 
 # https://docs.aws.amazon.com/ko_kr/rekognition/latest/dg/API_SearchFacesByImage.html
-def search_faces_by_image(bucket, key, collection, threshold=80, region='ap-northeast-2'):
+def search_faces_by_image(bucket, key, collection, threshold=70, region='ap-northeast-2'):
     client = boto3.client('rekognition', region)
     print(key)
     resp = client.search_faces_by_image(
@@ -70,16 +85,25 @@ def face_compare(image1, image2):
     delete_image(BUCKET, image2)
 
 def face_id(image, collection):
-    upload_image(BUCKET, collection)
+    upload_image(BUCKET, image)
+    faces = detect_faces(BUCKET, image, attributes=["DEFAULT"])
+    print('Checking %d faces' % len(faces))
 
-    faces = search_faces_by_image(BUCKET, image, collection)
-    if len(faces) == 0:
-        print('Match not found')
-    else:
-        for face in faces:
-            print('Matched Faces : {}%'.format(face['Similarity']))
-            print('  FaceId : {}'.format(face['Face']['FaceId']))
-            print('  ImageId : {}'.format(face['Face']['ExternalImageId']))
+    for idx, face in enumerate(faces):
+        filename = 'output%d.jpg' % idx
+        mark_face_image(image, face['BoundingBox'], filename, crop=True)
+        upload_image(BUCKET, filename)
+
+        faces = search_faces_by_image(BUCKET, filename, collection)
+        if len(faces) == 0:
+            print('Match not found')
+        else:
+            for face in faces:
+                print('Matched Faces : {}%'.format(face['Similarity']))
+                print('  FaceId : {}'.format(face['Face']['FaceId']))
+                print('  ImageId : {}'.format(face['Face']['ExternalImageId']))
+
+        delete_image(BUCKET, filename)
 
     delete_image(BUCKET, image)
 
