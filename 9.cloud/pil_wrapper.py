@@ -1,6 +1,8 @@
+# pip install pillow
 # https://pillow.readthedocs.io/en/stable/reference/Image.html
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
+from log_wrapper import log
 
 
 # https://docs.aws.amazon.com/rekognition/latest/dg/images-displaying-bounding-boxes.html
@@ -28,6 +30,7 @@ def mark_face_image(photo, location, filename=None):
 
     if filename:
         image.save(filename)
+        log.info("Result image '%s' saved", filename)
 
     return image
 
@@ -38,11 +41,11 @@ def merge_two_images(image1, location1, image2, location2, text):
     total_width = sum(widths)
     max_height = max(heights)
 
-    new_im = Image.new('RGB', (total_width, max_height))
+    new_img = Image.new('RGB', (total_width, max_height))
 
     x_offset = 0
     for im in images:
-        new_im.paste(im, (x_offset,0))
+        new_img.paste(im, (x_offset,0))
         x_offset += im.size[0]
 
     img1_width, img1_height = image1.size
@@ -52,29 +55,33 @@ def merge_two_images(image1, location1, image2, location2, text):
     height1 = img1_height * location1['Height']
 
     img2_width, img2_height = image2.size
-    left2 = img2_width * location2['Left']
+    left2 = img2_width * location2['Left'] + img1_width
     top2 = img2_height * location2['Top']
     width2 = img2_width * location2['Width']
     height2 = img2_height * location2['Height']
 
-    point1 = ((left1, top1), (img1_width + left2, top2)) # left top
-    point2 = ((left1 + width1, top1), (img1_width + left2 + width2, top2)) # right top
-    point3 = ((left1 + width1, top1 + height1), (img1_width + left2 + width2, top2 + height2)) # right bottom
-    point4 = ((left1 , top1 + height1), (img1_width + left2, top2 + height2)) # left bottom
+    # draw 4 lines
+    points = [
+        ((left1, top1), (left2, top2)), # left top
+        ((left1 + width1, top1), (left2 + width2, top2)), # right top
+        ((left1 + width1, top1 + height1), (left2 + width2, top2 + height2)), # right bottom
+        ((left1 , top1 + height1), (left2, top2 + height2)), # left bottom
+    ]
+    
+    draw = ImageDraw.Draw(new_img)
+    for pt in points:
+        draw.line(pt, fill='#00D000', width=1)
 
-    draw = ImageDraw.Draw(new_im)
-    draw.line(point1, fill='#00D400', width=1)
-    draw.line(point2, fill='#00D400', width=1)
-    draw.line(point3, fill='#00D400', width=1)
-    draw.line(point4, fill='#00D400', width=1)
-
+    # write text in black background
     font = ImageFont.truetype('fonts/arial.ttf', 25)
     w, h = font.getsize(text)
-    x = img1_width + left2
+    x = left2
     y = top2 - h - 2
     draw.rectangle((x, y, x + w, y + h), fill='black')
     draw.text((x, y), text, fill='white', font=font, align='left')
 
+    # save file
     now = datetime.now()
     nowDateTime = now.strftime('%Y%m%d_%H%M%S')
-    new_im.save('output-%s.jpg' % format(nowDateTime))
+    new_img.save('output-%s.jpg' % format(nowDateTime))
+    log.info("Merged image 'output-%s.jpg' saved", nowDateTime)
