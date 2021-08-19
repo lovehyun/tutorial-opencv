@@ -8,6 +8,7 @@ KEY = ''
 
 FEATURES_IGNORED = ('Landmarks', 'Pose', 'Quality', 'BoundingBox', 'Confidence', 'Beard', 'Mustache', 'EyesOpen', 'MouthOpen')
 
+# https://docs.aws.amazon.com/ko_kr/rekognition/latest/dg/faces-detect-images.html
 def detect_faces(bucket, key, attributes=['ALL'], region='ap-northeast-2'):
     client = boto3.client('rekognition', region)
     response = client.detect_faces(
