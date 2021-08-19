@@ -6,8 +6,11 @@ from log_wrapper import log
 
 
 # https://docs.aws.amazon.com/rekognition/latest/dg/images-displaying-bounding-boxes.html
-def mark_face_image(photo, location, filename=None, crop=False):
-    image = Image.open(photo)
+# mark the bounding boxes to the image
+def mark_face_image(photo, location, text=None, filename=None, crop=False, image=None):
+    if image is None:
+        image = Image.open(photo)
+
     img_width, img_height = image.size
 
     left = img_width * location['Left']
@@ -28,6 +31,16 @@ def mark_face_image(photo, location, filename=None, crop=False):
     # Alternatively can draw rectangle. However you can't set line width.
     # draw.rectangle([left,top, left + width, top + height], outline='#00d400')
 
+    # write text in black background
+    if text is not None:
+        font = ImageFont.truetype('fonts/arial.ttf', 25)
+        w, h = font.getsize(text)
+        x = left
+        y = top - h - 2
+        draw.rectangle((x, y, x + w, y + h), fill='black')
+        draw.text((x, y), text, fill='white', font=font, align='left')
+
+    # save the file
     if filename:
         if crop is False:
             image.save(filename)
@@ -38,6 +51,7 @@ def mark_face_image(photo, location, filename=None, crop=False):
 
     return image
 
+# Merge two images with bounding boxes connected together
 def merge_two_images(image1, location1, image2, location2, text):
     images = [image1, image2]
     widths, heights = zip(*(i.size for i in images))

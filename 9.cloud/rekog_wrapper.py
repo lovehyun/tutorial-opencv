@@ -66,19 +66,19 @@ def list_collections():
 
 # Add faces to collection
 # https://docs.aws.amazon.com/ko_kr/rekognition/latest/dg/add-faces-to-collection-procedure.html
-def add_faces_to_collection(bucket, photo, collection_id, path=''):
+def add_faces_to_collection(bucket, photo_id, collection_id, path=''):
     client = boto3.client('rekognition')
 
     resp = client.index_faces(CollectionId=collection_id,
-                              Image={'S3Object':{'Bucket':bucket,'Name':path+photo}},
-                              ExternalImageId=photo,
+                              Image={'S3Object':{'Bucket':bucket,'Name':path+photo_id[0]}},
+                              ExternalImageId=photo_id[1],
                               MaxFaces=1,
                               QualityFilter="AUTO",
                               DetectionAttributes=['ALL'])
     for faceRecord in resp['FaceRecords']:
         face_id = faceRecord['Face']['FaceId']
         location = faceRecord['Face']['BoundingBox']
-        log.info("Face in '%s' indexed: %s, %s", path+photo, face_id, location)
+        log.info("Face in '%s' indexed: %s, %s", path+photo_id[0], face_id, location)
 
     for unindexedFace in resp['UnindexedFaces']:
         location = unindexedFace['FaceDetail']['BoundingBox']
@@ -156,7 +156,7 @@ if __name__ == '__main__':
         file = open(image[0], 'rb')
         object = s3.Object(BUCKET, path+image[0])
         object.put(Body=file, Metadata={'FullName':image[1]})
-        add_faces_to_collection(BUCKET, image[0], COLLECTION, path=path)
+        add_faces_to_collection(BUCKET, image, COLLECTION, path=path)
 
     faces, _ = list_faces_in_collection(COLLECTION)
     for face in faces:

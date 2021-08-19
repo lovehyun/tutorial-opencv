@@ -61,6 +61,7 @@ def search_faces_by_image(bucket, key, collection, threshold=70, region='ap-nort
     )
     return resp['FaceMatches']
 
+# Compare two images and find matching faces
 def face_compare(image1, image2):
     upload_image(BUCKET, image1)
     upload_image(BUCKET, image2)
@@ -68,7 +69,7 @@ def face_compare(image1, image2):
     src_face, matches = compare_faces(BUCKET, image1, image2)
     print('Source Face Confidence : {Confidence:.3f}%, location: {BoundingBox}'.format(**src_face))
     image1_location = src_face['BoundingBox']
-    image1_marked = mark_face_image(image1, image1_location, 'match1.png')
+    image1_marked = mark_face_image(image1, image1_location, filename='match1.png')
 
     if len(matches) == 0:
         print('No match found')
@@ -78,32 +79,49 @@ def face_compare(image1, image2):
             print('Similarity : {:.3f} %'.format(match['Similarity']))
             similarity = 'Similarity: {:.3f}%'.format(match['Similarity'])
             image2_location = match['Face']['BoundingBox']
-            image2_marked = mark_face_image(image2, image2_location, 'match2.png')
+            image2_marked = mark_face_image(image2, image2_location, filename='match2.png')
             merge_two_images(image1_marked, image1_location, image2_marked, image2_location, similarity)
 
     delete_image(BUCKET, image1)
     delete_image(BUCKET, image2)
 
+# Check the DB with face-id existance
 def face_id(image, collection):
+    # upload image and detect faces
     upload_image(BUCKET, image)
     faces = detect_faces(BUCKET, image, attributes=["DEFAULT"])
     print('Checking %d faces' % len(faces))
 
+    # check individual identifications
     for idx, face in enumerate(faces):
-        filename = 'output%d.jpg' % idx
-        mark_face_image(image, face['BoundingBox'], filename, crop=True)
+        # crop the face images
+        filename = 'output%d-face.jpg' % idx
+        marked_img = mark_face_image(image, face['BoundingBox'], filename=filename, crop=True)
         upload_image(BUCKET, filename)
 
-        faces = search_faces_by_image(BUCKET, filename, collection)
+        # search the database(collection)
+        db_faces = search_faces_by_image(BUCKET, filename, collection)
+        access = "Access Denied"
         if len(faces) == 0:
             print('Match not found')
         else:
-            for face in faces:
-                print('Matched Faces : {}%'.format(face['Similarity']))
-                print('  FaceId : {}'.format(face['Face']['FaceId']))
-                print('  ImageId : {}'.format(face['Face']['ExternalImageId']))
+            for db_face in db_faces:
+                access = "Access Granted : %s" % db_face['Face']['ExternalImageId']
+                print('Matched Faces : {}%'.format(db_face['Similarity']))
+                print('  FaceId : {}'.format(db_face['Face']['FaceId']))
+                print('  ImageId : {}'.format(db_face['Face']['ExternalImageId']))
 
         delete_image(BUCKET, filename)
+
+        # mark the result
+        filename2 = 'output%d-result.jpg' % idx
+        mark_face_image(image, face['BoundingBox'], text=access, filename=filename2)
+
+        filename3 = 'output-results.jpg'
+        if idx == 0:
+            marked_img2 = mark_face_image(image, face['BoundingBox'], text=access, filename=filename3, image=marked_img)
+        else:
+            marked_img2 = mark_face_image(image, face['BoundingBox'], text=access, filename=filename3, image=marked_img2)
 
     delete_image(BUCKET, image)
 
