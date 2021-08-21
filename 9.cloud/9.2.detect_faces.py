@@ -2,6 +2,7 @@ import boto3
 import sys
 import pprint
 from s3_wrapper import upload_image
+from pil_wrapper import mark_face_image
 
 BUCKET = 'shpark-rekognition' # put your own bucket here
 KEY = ''
@@ -35,6 +36,14 @@ if __name__ == '__main__':
 
         # facial features
         for feature, data in face.items():
+            print(feature)
             if feature not in FEATURES_IGNORED:
                 print('\n' + feature + ':')
                 pprint.pprint(data)
+
+        # save image
+        text = []
+        for emo in face['Emotions']:
+            text.append("{Type:10}: {Confidence:5.2f}%\n".format(**emo))
+
+        mark_face_image(KEY, face['BoundingBox'], text, fontsize=12, filename='output.png')

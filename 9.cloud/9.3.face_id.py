@@ -1,3 +1,4 @@
+# https://docs.aws.amazon.com/ko_kr/rekognition/latest/dg/rekognition-dg.pdf
 import boto3
 import sys
 
@@ -102,14 +103,17 @@ def face_id(image, collection):
         # search the database(collection)
         db_faces = search_faces_by_image(BUCKET, filename, collection)
         access = "Access Denied"
-        if len(faces) == 0:
+        if len(db_faces) == 0:
             print('Match not found')
         else:
-            for db_face in db_faces:
-                access = "Access Granted : %s" % db_face['Face']['ExternalImageId']
-                print('Matched Faces : {}%'.format(db_face['Similarity']))
-                print('  FaceId : {}'.format(db_face['Face']['FaceId']))
-                print('  ImageId : {}'.format(db_face['Face']['ExternalImageId']))
+            # get the first id
+            db_face = db_faces[0]
+            access = []
+            access.append("Access Granted")
+            access.append("ID : %s" % db_face['Face']['ExternalImageId'])
+            print('Matched Faces : {}%'.format(db_face['Similarity']))
+            print('  FaceId : {}'.format(db_face['Face']['FaceId']))
+            print('  ImageId : {}'.format(db_face['Face']['ExternalImageId']))
 
         delete_image(BUCKET, filename)
 
@@ -137,7 +141,7 @@ if __name__ == '__main__':
         image1 = sys.argv[2]
         KEY2 = sys.argv[3]
         print(image1, KEY2)
-        face_compare(image1, KEY2)    
+        face_compare(image1, KEY2)
     elif OPTION == 'id':
         image1 = sys.argv[2]
         print(image1)

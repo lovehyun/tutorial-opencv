@@ -5,6 +5,7 @@ from s3_wrapper import upload_image
 BUCKET = 'shpark-rekognition' # put your own bucket here
 KEY = ''
 
+# https://docs.aws.amazon.com/ko_kr/rekognition/latest/dg/labels-detect-labels-image.html
 def get_labels(bucket, key, max_labels=10, min_confidence=90, region='ap-northeast-2'):
     client = boto3.client('rekognition', region)
     response = client.detect_labels(
