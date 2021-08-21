@@ -7,7 +7,7 @@ from log_wrapper import log
 
 # https://docs.aws.amazon.com/rekognition/latest/dg/images-displaying-bounding-boxes.html
 # mark the bounding boxes to the image
-def mark_face_image(photo, location, text=None, filename=None, crop=False, image=None):
+def mark_face_image(photo, location, text=None, filename=None, crop=False, fontsize=25, fontbg='black', image=None):
     if image is None:
         image = Image.open(photo)
 
@@ -33,12 +33,26 @@ def mark_face_image(photo, location, text=None, filename=None, crop=False, image
 
     # write text in black background
     if text is not None:
-        font = ImageFont.truetype('fonts/arial.ttf', 25)
-        w, h = font.getsize(text)
+        font = ImageFont.truetype('fonts/consola.ttf', fontsize)
+        hs = 0
+        ws = 0
+
+        # support for multiline texts
+        if not isinstance(text, list):
+            text = [text]
+
+        for line in text:
+            w, h = font.getsize(line)
+            ws = max(ws, w)
+            hs += h
+
         x = left
-        y = top - h - 2
-        draw.rectangle((x, y, x + w, y + h), fill='black')
-        draw.text((x, y), text, fill='white', font=font, align='left')
+        y = top + height + 2
+        draw.rectangle((x, y, x + ws, y + hs), fill=fontbg)
+
+        for line in text:
+            draw.text((x, y), line, fill='white', font=font, align='left')
+            y += h
 
     # save the file
     if filename:
