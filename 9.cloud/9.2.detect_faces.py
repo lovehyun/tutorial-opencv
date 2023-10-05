@@ -1,7 +1,7 @@
 import boto3
 import sys
 import pprint
-from s3_wrapper import upload_image
+from s3_wrapper import upload_image, delete_image
 from pil_wrapper import mark_face_image
 
 BUCKET = 'shpark-rekognition' # put your own bucket here
@@ -27,7 +27,7 @@ def detect_faces(bucket, key, attributes=['ALL'], region='ap-northeast-2'):
 
 if __name__ == '__main__':
     KEY = sys.argv[1]
-    print(KEY)
+    print('File to check: ', KEY)
 
     upload_image(BUCKET, KEY)
 
@@ -47,3 +47,5 @@ if __name__ == '__main__':
             text.append("{Type:10}: {Confidence:5.2f}%\n".format(**emo))
 
         mark_face_image(KEY, face['BoundingBox'], text, fontsize=12, filename='output.png')
+
+    delete_image(BUCKET, KEY)

@@ -1,4 +1,4 @@
-# pip install pillow
+# pip install pillow==9.5.0
 # https://pillow.readthedocs.io/en/stable/reference/Image.html
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
@@ -29,7 +29,7 @@ def mark_face_image(photo, location, text=None, filename=None, crop=False, fonts
     draw = ImageDraw.Draw(image)
     draw.line(points, fill='#00FF00', width=2)
     # Alternatively can draw rectangle. However you can't set line width.
-    # draw.rectangle([left,top, left + width, top + height], outline='#00d400')
+    # draw.rectangle([left, top, left + width, top + height], outline='#00d400')
 
     # write text in black background
     if text is not None:

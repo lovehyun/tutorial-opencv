@@ -1,6 +1,6 @@
 import boto3
 import sys
-from s3_wrapper import upload_image
+from s3_wrapper import upload_image, delete_image
 
 BUCKET = 'shpark-rekognition' # put your own bucket here
 KEY = ''
@@ -24,10 +24,11 @@ def get_labels(bucket, key, max_labels=10, min_confidence=90, region='ap-northea
 
 if __name__ == '__main__':
     KEY = sys.argv[1]
-    print('Filed to check: ', KEY)
+    print('File to check: ', KEY)
 
     upload_image(BUCKET, KEY)
     labels = get_labels(BUCKET, KEY)
+    delete_image(BUCKET, KEY)
 
     for label in labels:
         print('{Name} - {Confidence:.3f}%'.format(**label))
