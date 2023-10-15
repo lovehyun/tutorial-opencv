@@ -24,11 +24,11 @@ def get_labels(bucket, key, max_labels=10, min_confidence=90, region='ap-northea
 
 if __name__ == '__main__':
     KEY = sys.argv[1]
-    print('File to check: ', KEY)
+    print('File to analyze: ', KEY)
 
     upload_image(BUCKET, KEY)
     labels = get_labels(BUCKET, KEY)
-    delete_image(BUCKET, KEY)
+    # delete_image(BUCKET, KEY)
 
     for label in labels:
         print('{Name} - {Confidence:.3f}%'.format(**label))
