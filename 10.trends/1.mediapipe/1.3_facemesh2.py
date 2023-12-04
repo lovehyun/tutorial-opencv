@@ -29,18 +29,18 @@ with mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, min_detecti
                     h, w, c = image.shape
                     x, y = int(landmark.x * w), int(landmark.y * h)
 
-                    if idx in {10, 152, 234, 454, 151, 389}:  # Selecting major points (eyes, mouth)
+                    if idx in {29, 390, 61, 291}:  # Selecting major points (eyes, mouth)
                         point_names = {
-                            10: "Right eye",
-                            152: "Left eye",
-                            234: "Right eye",
-                            454: "Left eye",
-                            151: "Right mouth corner",
-                            389: "Left mouth corner",
+                            29: "Right eye",
+                            390: "Left eye",
+                            61: "Right mouth",
+                            291: "Left mouth",
                         }
                         point_name = point_names.get(idx, "Other")
-                        # cv2.putText(image, f"{idx}: {point_name}", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 1)
+                        cv2.putText(image, f"{idx}: {point_name}", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
 
+        # 이미지 크기를 가로와 세로 각각 3배 확대
+        image = cv2.resize(image, (0, 0), fx=3, fy=3)
         cv2.imshow('Face Mesh', image)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
