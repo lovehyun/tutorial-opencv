@@ -42,7 +42,8 @@ def mark_face_image(photo, location, text=None, filename=None, crop=False, fonts
             text = [text]
 
         for line in text:
-            w, h = font.getsize(line)
+            # w, h = font.getsize(line) # pillow==9.5.0
+            _, _, w, h = font.getbbox(line) # pillow==10.3.0
             ws = max(ws, w)
             hs += h
 

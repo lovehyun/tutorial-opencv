@@ -21,12 +21,12 @@ while True:
 
     cv2.imshow('frame', frame)
 
-    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # faces = face_cascade.detectMultiScale(gray)
-    # for (x,y,w,h) in faces:
-    #     cv2.rectangle(frame, (x,y), (x+w,y+h), (0, 255, 0), thickness=2)
-    #     cv2.putText(frame, "FACE", (x,y), cv2.FONT_HERSHEY_PLAIN, 1.2, (0, 255, 255), 1)
-    #     cv2.imshow('frame', frame)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray)
+    for (x,y,w,h) in faces:
+        cv2.rectangle(frame, (x,y), (x+w,y+h), (0, 255, 0), thickness=2)
+        cv2.putText(frame, "FACE", (x,y), cv2.FONT_HERSHEY_PLAIN, 1.2, (0, 255, 255), 1)
+        cv2.imshow('frame', frame)
 
     dst = cv2.Canny(frame, 50, 200)
     cv2.imshow('canny', dst)

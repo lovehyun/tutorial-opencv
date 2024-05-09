@@ -29,6 +29,7 @@ if __name__ == '__main__':
     upload_image(BUCKET, KEY)
     labels = get_labels(BUCKET, KEY)
     # delete_image(BUCKET, KEY)
+    print(labels)
 
     for label in labels:
         print('{Name} - {Confidence:.3f}%'.format(**label))
