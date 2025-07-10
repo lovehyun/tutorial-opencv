@@ -1,4 +1,11 @@
+# project files
 .vscode
+
+# data files
 *.weights
 *.cfg
+
+# python compile
 *.pyc
+__pycache__
+
