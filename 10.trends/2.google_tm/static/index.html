@@ -1,0 +1,49 @@
+<!-- static/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pose Classifier</title>
+</head>
+<body>
+    <h1>Pose Detection</h1>
+    <video id="video" width="400" height="300" autoplay muted></video>
+    <p id="result">Result will appear here</p>
+
+    <script>
+        const video = document.getElementById("video");
+        const resultText = document.getElementById("result");
+
+        // 카메라 활성화
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            video.srcObject = stream;
+        });
+
+        // 일정 주기로 서버로 이미지 전송
+        setInterval(() => {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0);
+
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append("frame", blob, "frame.jpg");
+
+                fetch("/predict", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    resultText.innerText = `Class: ${data.class}, Confidence: ${data.confidence.toFixed(2)}`;
+                })
+                .catch(err => {
+                    resultText.innerText = "Error in prediction";
+                    console.error(err);
+                });
+            }, "image/jpeg");
+        }, 1000);  // 1초마다 전송
+    </script>
+</body>
+</html>
