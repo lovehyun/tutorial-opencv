@@ -13,7 +13,7 @@ cv2.imshow('original', img)
 concept = True
 
 # part 1. brightness - 컨셉
-enhance = 50
+enhance = 50 # 밝기 조정 값 (+: 밝게, -: 어둡게)
 bright = np.zeros(img.shape, np.uint8)
 if concept is True:
     for h in range(height):
@@ -28,15 +28,16 @@ if concept is True:
                     bright[h,w,c] = 0
                 else:
                     bright[h,w,c] = pixel
-else:
-    mat = img.astype('int16')
-    bright = np.clip(mat + enhance, 0, 255)
-    bright = bright.astype('uint8')
+else: # numpy를 이용한 벡터화 연산
+    mat = img.astype('int16') # 오버플로우 방지를 위한 타입 변환
+    bright = np.clip(mat + enhance, 0, 255) # 범위 클리핑
+    bright = bright.astype('uint8') # 다시 이미지용 타입으로 변환
 
 cv2.imshow('brightness', bright)
 
+
 # part2. contrast - 컨셉
-factor = 0.5
+factor = 0.5 # 대비 조정 계수 (0: 변화 없음, 양수: 선명하게, 음수: 흐리게)
 contrast = np.zeros(img.shape, np.uint8)
 if concept is True:
     for h in range(height):

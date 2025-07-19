@@ -34,24 +34,3 @@ cv2.imshow('my_resized', img_resized)
 img_resized = cv2.resize(img, (width_to, height_to), interpolation=cv2.INTER_AREA)
 cv2.imshow('resized', img_resized)
 cv2.waitKey()
-
-# part 2. resize - 확대
-scale = 3.0
-height_to = int(height * scale)
-width_to = int(width * scale)
-
-print("From: (%d,%d,%d) => To: (%d,%d,%d)" % (height, width, channel, height_to, width_to, channel))
-
-img_resized = np.empty((height_to, width_to, channel), dtype=np.uint8)
-for h in range(height_to):
-    for w in range(width_to):
-        for c in range(channel):
-            img_resized[h,w,c] = img[int(h/scale),int(w/scale),c]
-
-cv2.imshow('my_resized', img_resized)
-
-img_resized = cv2.resize(img, (width_to, height_to), interpolation=cv2.INTER_LANCZOS4)
-cv2.imshow('resized', img_resized)
-
-cv2.waitKey()
-cv2.destroyAllWindows()

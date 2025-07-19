@@ -1,0 +1,9 @@
+<!-- camera-test.html -->
+<video id="video" autoplay muted playsinline width="640" height="480"></video>
+<script>
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      document.getElementById('video').srcObject = stream;
+    })
+    .catch(err => console.error('CAMERA ERROR', err));
+</script>
