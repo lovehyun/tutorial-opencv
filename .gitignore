@@ -4,6 +4,7 @@
 # data files
 *.weights
 *.cfg
+yolo*.pt
 
 # python compile
 *.pyc

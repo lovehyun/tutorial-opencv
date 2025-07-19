@@ -32,7 +32,7 @@ with mp_hands.Hands(static_image_mode=True) as hands:  # 손 감지기
             cx, cy = int(lm.x * w), int(lm.y * h)
             print(f"{i}번 손끝: x={cx:3d}, y={cy:3d}")
             
-                # 이미지에 숫자 1~5 쓰기
+            # 이미지에 숫자 1~5 쓰기
             cv2.putText(img, str(idx + 1), (cx, cy),
                 cv2.FONT_HERSHEY_SIMPLEX,     # 글꼴
                 1,                            # 글자 크기

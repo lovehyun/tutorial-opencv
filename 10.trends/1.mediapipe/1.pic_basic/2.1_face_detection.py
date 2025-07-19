@@ -14,9 +14,9 @@ with mp_face.FaceDetection(model_selection=1, min_detection_confidence=0.5) as f
 
     res = fd.process(rgb)
 
-if res.detections:
-    for det in res.detections:
-        mp_draw.draw_detection(img, det)
+    if res.detections:
+        for det in res.detections:
+            mp_draw.draw_detection(img, det)
 
 cv2.imshow("Face Detection", img)
 cv2.waitKey(0); cv2.destroyAllWindows()
