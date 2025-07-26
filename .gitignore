@@ -5,6 +5,7 @@
 *.weights
 *.cfg
 yolo*.pt
+capture_*
 
 # python compile
 *.pyc
