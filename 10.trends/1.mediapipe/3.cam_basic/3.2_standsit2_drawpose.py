@@ -3,6 +3,8 @@ realtime_sit_stand.py
 웹캠 영상에서 실시간으로 '앉음 / 섬' 판별하기
 """
 import cv2, mediapipe as mp, math, time
+from mediapipe.framework.formats import landmark_pb2
+from opencv_korfont import draw_korean_text
 
 # ── 각도 계산 함수 ────────────────────────────────────────────
 def angle(a, b, c):
@@ -50,20 +52,50 @@ while cap.isOpened():
             print(f"[{time.strftime('%H:%M:%S')}] 상태 변경 ➜ {state}")
 
         # 프레임에 각도·상태 표시
-        cv2.putText(frame, f"Knee: {knee_ang:.1f} deg",
-                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,255), 2)
-        cv2.putText(frame, f"Status: {state}",
-                    (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 2)
+        # cv2.putText(frame, f"Knee: {knee_ang:.1f} deg",
+        #            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,255), 2)
+        # cv2.putText(frame, f"Status: {state}",
+        #            (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 2)
+        frame = draw_korean_text(frame, f"Knee: {knee_ang:.1f} deg",
+                        (10, 30), color=(0,255,255))
+        frame = draw_korean_text(frame, f"Status: {state}", 
+                        (10, 70), color=(0,255,0))
 
-        # 포즈 랜드마크 그리기 (옵션)
+
+        # 1. 포즈 전체 랜드마크 그리기
+        # mp_draw.draw_landmarks(
+        #     frame, res.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+        #     mp_draw.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=2), # 점 (landmark)
+        #     mp_draw.DrawingSpec(color=(0,0,255), thickness=2)                   # 선 (connection)
+        # )
+
+        # 2. 얼굴 좌표를 제외한 인덱스 (11~32번)
+        remove_to_index = 11
+        exclude_indices = set(range(0, remove_to_index))  # 얼굴 인덱스
+        filtered_connections = [
+            (start, end) for (start, end) in mp_pose.POSE_CONNECTIONS
+            if start not in exclude_indices and end not in exclude_indices
+        ]
+
+        # ─ 얼굴 제외한 landmarks 구성 ─
+        filtered_landmarks = [lm[i] for i in range(len(lm)) if i >= remove_to_index]
+        dummy_landmarks = [landmark_pb2.NormalizedLandmark(x=0, y=0, z=0, visibility=0) for _ in range(remove_to_index)]
+        combined_landmarks = landmark_pb2.NormalizedLandmarkList(
+            landmark=dummy_landmarks + list(filtered_landmarks)
+        )
+
+        # ─ 얼굴 제외하고 draw_landmarks ─
         mp_draw.draw_landmarks(
-            frame, res.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-            mp_draw.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=2),
-            mp_draw.DrawingSpec(color=(0,0,255), thickness=2)
+            frame,
+            combined_landmarks,
+            filtered_connections,
+            mp_draw.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2),
+            mp_draw.DrawingSpec(color=(0, 0, 255), thickness=2)
         )
 
     cv2.imshow("Sit / Stand Detector", frame)
-    if cv2.waitKey(1) & 0xFF == 27:   # ESC 키
+    key = cv2.waitKey(1) & 0xFF
+    if key == 27 or key == ord('q'):   # ESC 키 또는 q
         break
 
 # ── 정리 ────────────────────────────────────────────────────
